@@ -1,9 +1,12 @@
+import logging
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from bot.translator import translate, TranslationError
 from bot.embeds import build_translation_embed, build_error_embed
+
+log = logging.getLogger(__name__)
 
 class TranslateCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -41,8 +44,22 @@ class TranslateCommands(commands.Cog):
         try:
             result = await translate(text)
         except TranslationError as e:
+            log.error("Translation failed: %s", e)
             await interaction.followup.send(
-                embed=build_error_embed(str(e)),
+                embed=build_error_embed(
+                    "A service error occurred whilst translating. "
+                    "If this continues, please contact your admin."
+                ),
+                ephemeral=True,
+            )
+            return
+        except Exception as e:
+            log.exception("Unexpected error during translation: %s", e)
+            await interaction.followup.send(
+                embed=build_error_embed(
+                    "An unexpected error occurred. "
+                    "If this continues, please contact your admin."
+                ),
                 ephemeral=True,
             )
             return

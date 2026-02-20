@@ -20,18 +20,27 @@ async def translate(text: str, target: str = LIBRETRANSLATE_LANG, source: str = 
         "Content-Type": "application/json",
     }
 
-    async with aiohttp.ClientSession(headers=headers) as session:
-        try:
+    try:
+        async with aiohttp.ClientSession(headers=headers) as session:
             async with session.post(f"{LIBRETRANSLATE_URL}/translate", json=payload) as resp:
                 if resp.status != 200:
-                    raise TranslationError(f"LibreTranslate returned HTTP {resp.status}. If this persists, your instance may be behind a bot challenge — check server logs.")
+                    raise TranslationError(
+                        f"LibreTranslate returned HTTP {resp.status}. "
+                        "Your instance may be behind a bot challenge — check server logs."
+                    )
 
-                data = await resp.json()
+                data = await resp.json(content_type=None)
+
+                translated = data.get("translatedText")
+                if not translated:
+                    raise TranslationError(
+                        "LibreTranslate returned a successful response but no translated text."
+                    )
 
                 return {
-                    "translatedText": data.get("translatedText", ""),
+                    "translatedText": translated,
                     "detectedLanguage": data.get("detectedLanguage", {}).get("language", "unknown"),
                 }
 
-        except aiohttp.ClientError as e:
-            raise TranslationError(f"Could not reach LibreTranslate: {e}")
+    except aiohttp.ClientError as e:
+        raise TranslationError(f"Could not reach LibreTranslate: {e}")
