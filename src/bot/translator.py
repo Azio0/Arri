@@ -15,12 +15,16 @@ async def translate(text: str, target: str = LIBRETRANSLATE_LANG, source: str = 
     if LIBRETRANSLATE_API_KEY:
         payload["api_key"] = LIBRETRANSLATE_API_KEY
 
-    async with aiohttp.ClientSession() as session:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
         try:
             async with session.post(f"{LIBRETRANSLATE_URL}/translate", json=payload) as resp:
                 if resp.status != 200:
-                    error = await resp.text()
-                    raise TranslationError(f"LibreTranslate returned {resp.status}: {error}")
+                    raise TranslationError(f"LibreTranslate returned HTTP {resp.status}. If this persists, your instance may be behind a bot challenge — check server logs.")
 
                 data = await resp.json()
 
