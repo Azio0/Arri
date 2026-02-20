@@ -1,5 +1,5 @@
 import discord
-from bot.config import LIBRETRANSLATE_LANGG
+from bot.config import LIBRETRANSLATE_LANG
 
 def build_translation_embed(
     original_text: str,
@@ -17,7 +17,7 @@ def build_translation_embed(
         inline=False,
     )
     embed.add_field(
-        name=f"Translated (`{LIBRETRANSLATE_LANGG}`)",
+        name=f"Translated (`{LIBRETRANSLATE_LANG}`)",
         value=translated_text[:1024],
         inline=False,
     )

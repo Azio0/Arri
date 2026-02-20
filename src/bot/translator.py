@@ -1,10 +1,10 @@
 import aiohttp
-from bot.config import LIBRETRANSLATE_URL, LIBRETRANSLATE_API_KEY, LIBRETRANSLATE_LANGG
+from bot.config import LIBRETRANSLATE_URL, LIBRETRANSLATE_API_KEY, LIBRETRANSLATE_LANG
 
 class TranslationError(Exception):
     pass
 
-async def translate(text: str, target: str = LIBRETRANSLATE_LANGG, source: str = "auto") -> dict:
+async def translate(text: str, target: str = LIBRETRANSLATE_LANG, source: str = "auto") -> dict:
     payload = {
         "q": text,
         "source": source,
